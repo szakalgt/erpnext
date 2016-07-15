@@ -78,8 +78,9 @@ def make_purchase_order(source_name, target_doc=None):
 				["parent", "supplier_quotation"],
 				["uom", "stock_uom"],
 				["uom", "uom"],
-				["material_request", "material_request"],
-				["material_request_item", "material_request_item"]
+				["prevdoc_detail_docname", "prevdoc_detail_docname"],
+				["prevdoc_doctype", "prevdoc_doctype"],
+				["prevdoc_docname", "prevdoc_docname"]
 			],
 			"postprocess": update_item
 		},

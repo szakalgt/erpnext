@@ -5,7 +5,7 @@ frappe.treeview_settings["Sales Person"] = {
 		{fieldtype:'Link', fieldname:'employee',
 			label:__('Employee'), options:'Employee',
 			description: __("Please enter Employee Id of this sales person")},
-		{fieldtype:'Check', fieldname:'is_group', label:__('Group Node'),
+		{fieldtype:'Select', fieldname:'is_group', label:__('Group Node'), options:'No\nYes',
 			description: __("Further nodes can be only created under 'Group' type nodes")}
 	],
 }

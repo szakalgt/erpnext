@@ -4,39 +4,16 @@ import frappe, sys
 import erpnext
 import frappe.utils
 from erpnext.demo.setup_data import setup_data
-from erpnext.demo.user import hr, sales, purchase, manufacturing, stock, accounts
-
-"""
-Make a demo
-
-1. Start with a fresh account
-
-bench --site demo.erpnext.dev reinstall
-
-2. Install Demo
-
-bench --site demo.erpnext.dev execute erpnext.demo.demo.make
-
-3. If Demo breaks, to continue
-
-bench --site demo.erpnext.dev execute erpnext.demo.demo.simulate
-
-"""
+from erpnext.demo.user import hr, sales
 
 def make(domain='Manufacturing'):
 	frappe.flags.domain = domain
-	frappe.flags.mute_emails = True
 	setup_data()
-	site = frappe.local.site
-	frappe.destroy()
-	frappe.init(site)
-	frappe.connect()
 	simulate()
 
 def simulate():
 	runs_for = frappe.flags.runs_for or 150
 	frappe.flags.company = erpnext.get_default_company()
-	frappe.flags.mute_emails = True
 
 	if not frappe.flags.start_date:
 		# start date = 100 days back
@@ -65,10 +42,10 @@ def simulate():
 
 		hr.work()
 		sales.work()
-		purchase.work()
-		manufacturing.work()
-		stock.work()
-		accounts.work()
+		# run_purchase()
+		# run_manufacturing()
+		# run_stock()
+		# run_accounts()
 		# run_projects()
 		# run_messages()
 

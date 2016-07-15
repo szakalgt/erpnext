@@ -79,7 +79,6 @@ rfq = Class.extend({
 				},
 				btn: this,
 				callback: function(r){
-					$('.btn-sm').hide()
 					frappe.unfreeze();
 				}
 			})

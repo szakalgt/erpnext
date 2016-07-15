@@ -8,7 +8,6 @@
  "docstatus": 0, 
  "doctype": "DocType", 
  "document_type": "", 
- "editable_grid": 1, 
  "fields": [
   {
    "allow_on_submit": 0, 
@@ -24,7 +23,7 @@
    "label": "Time Sheet", 
    "length": 0, 
    "no_copy": 0, 
-   "options": "Timesheet", 
+   "options": "Time Sheet", 
    "permlevel": 0, 
    "precision": "", 
    "print_hide": 0, 
@@ -72,7 +71,7 @@
  "issingle": 0, 
  "istable": 1, 
  "max_attachments": 0, 
- "modified": "2016-07-11 03:28:07.152366", 
+ "modified": "2016-06-15 17:59:57.876373", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "Salary Slip Timesheet", 

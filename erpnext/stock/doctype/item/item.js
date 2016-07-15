@@ -40,9 +40,8 @@ frappe.ui.form.on("Item", {
 
 		// make sensitive fields(has_serial_no, is_stock_item, valuation_method)
 		// read only if any stock ledger entry exists
-		if(!frm.doc.is_fixed_asset) {
-			erpnext.item.make_dashboard(frm);
-		}
+
+		erpnext.item.make_dashboard(frm);
 
 		// clear intro
 		frm.set_intro();
@@ -77,8 +76,7 @@ frappe.ui.form.on("Item", {
 
 		erpnext.item.toggle_attributes(frm);
 
-		frm.toggle_enable("is_fixed_asset", !frm.doc.is_stock_item &&
-			((frm.doc.__onload && frm.doc.__onload.asset_exists) ? false : true));
+
 	},
 
 	validate: function(frm){
@@ -87,16 +85,6 @@ frappe.ui.form.on("Item", {
 
 	image: function(frm) {
 		refresh_field("image_view");
-	},
-	
-	is_fixed_asset: function(frm) {
-		if (frm.doc.is_fixed_asset) {
-			frm.set_value("is_stock_item", 0);
-		}
-	},
-	
-	is_stock_item: function(frm) {
-		frm.toggle_enable("is_fixed_asset", !frm.doc.is_stock_item);
 	},
 
 	page_name: frappe.utils.warn_page_name_change,
@@ -172,40 +160,40 @@ $.extend(erpnext.item, {
 		frm.fields_dict.supplier_items.grid.get_field("supplier").get_query = function(doc, cdt, cdn) {
 			return { query: "erpnext.controllers.queries.supplier_query" }
 		}
-
+		
 		frm.fields_dict['default_warehouse'].get_query = function(doc) {
 			return {
 				filters: { "is_group": 0 }
 			}
 		}
-
+		
 		frm.fields_dict.reorder_levels.grid.get_field("warehouse_group").get_query = function(doc, cdt, cdn) {
 			return {
 				filters: { "is_group": 1 }
 			}
 		}
-
+		
 		frm.fields_dict.reorder_levels.grid.get_field("warehouse").get_query = function(doc, cdt, cdn) {
 			var d = locals[cdt][cdn];
-			
-			var filters = {
-				"is_group": 0
-			}
-			
-			if (d.parent_warehouse) {
-				filters.extend({"parent_warehouse": d.warehouse_group})
-			}
-			
 			return {
-				filters: filters
+				filters: {
+					"is_group": 0,
+					"parent_warehouse": d.warehouse_group
+				}
 			}
 		}
 
 	},
 
 	make_dashboard: function(frm) {
+		frm.dashboard.reset();
 		if(frm.doc.__islocal)
 			return;
+
+		frm.dashboard.show_heatmap = frm.doc.is_stock_item;
+		frm.dashboard.heatmap_message = __('This is based on stock movement. See {0} for details',
+			['<a href="#query-report/Stock Ledger">' + __('Stock Ledger') + '</a>']);
+		frm.dashboard.show_dashboard();
 
 		frappe.require('assets/js/item-dashboard.min.js', function() {
 			var section = frm.dashboard.add_section('<h5 style="margin-top: 0px;"><a href="#stock-balance">Stock Levels</a></h5>');

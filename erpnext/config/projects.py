@@ -31,13 +31,13 @@ def get_data():
 			"items": [
 				{
 					"type": "doctype",
-					"name": "Timesheet",
-					"description": _("Timesheet for tasks."),
+					"name": "Time Sheet",
+					"description": _("Time Sheet for tasks."),
 				},
 				{
 					"type": "doctype",
 					"name": "Activity Type",
-					"description": _("Types of activities for Time Logs"),
+					"description": _("Types of activities for Time Sheets"),
 				},
 				{
 					"type": "doctype",
@@ -53,8 +53,8 @@ def get_data():
 				{
 					"type": "report",
 					"is_query_report": True,
-					"name": "Daily Timesheet Summary",
-					"doctype": "Timesheet"
+					"name": "Daily Time Sheet Summary",
+					"doctype": "Time Sheet"
 				},
 				{
 					"type": "report",

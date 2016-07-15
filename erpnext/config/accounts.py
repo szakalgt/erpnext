@@ -22,14 +22,9 @@ def get_data():
 					"description": _("Payment Request")
 				},
 				{
-					"type": "doctype",
-					"name": "Payment Entry",
-					"description": _("Bank/Cash transactions against party or for internal transfer")
-				},
-				{
 					"type": "report",
 					"name": "Accounts Receivable",
-					"doctype": "Sales Invoice",	
+					"doctype": "Sales Invoice",
 					"is_query_report": True
 				},
 				{
@@ -51,16 +46,22 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"name": "Payment Entry",
+					"description": _("Payment entries against party or for internal transfer")
+				},
+				{
+					"type": "doctype",
 					"name": "Journal Entry",
 					"description": _("Accounting journal entries.")
 				},
 				{
-					"type": "doctype",
-					"name": "Account",
+					"type": "page",
+					"name": "Tree",
 					"icon": "icon-sitemap",
 					"label": _("Chart of Accounts"),
 					"route": "Tree/Account",
 					"description": _("Tree of financial accounts."),
+					"doctype": "Account",
 				},
 				{
 					"type": "report",
@@ -196,12 +197,13 @@ def get_data():
 			"label": _("Budget and Cost Center"),
 			"items": [
 				{
-					"type": "doctype",
-					"name": "Cost Center",
+					"type": "page",
+					"name": "Tree",
 					"icon": "icon-sitemap",
 					"label": _("Chart of Cost Centers"),
 					"route": "Tree/Cost Center",
 					"description": _("Tree of financial Cost Centers."),
+					"doctype": "Cost Center",
 				},
 				{
 					"type": "doctype",
@@ -233,11 +235,6 @@ def get_data():
 					"type": "doctype",
 					"name": "Asset Movement",
 					"description": _("Transfer an asset from one warehouse to another")
-				},
-				{
-					"type": "doctype",
-					"name": "Cheque Print Template",
-					"description": _("Setup cheque dimensions for printing")
 				},
 			]
 		},

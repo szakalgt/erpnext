@@ -14,7 +14,6 @@ def setup_data():
 	setup_customer()
 	setup_supplier()
 	setup_item()
-	setup_warehouse()
 	import_json('Address')
 	import_json('Contact')
 	setup_workstation()
@@ -28,8 +27,6 @@ def setup_data():
 	setup_employee()
 	setup_salary_structure()
 	setup_user_roles()
-	frappe.db.commit()
-	frappe.clear_cache()
 
 def complete_setup(domain='Manufacturing'):
 	print "Complete Setup..."
@@ -147,14 +144,8 @@ def setup_item():
 	for i in items:
 		item = frappe.new_doc('Item')
 		item.update(i)
-		item.min_order_qty = random.randint(10, 30)
 		item.default_warehouse = frappe.get_all('Warehouse', filters={'warehouse_name': item.default_warehouse}, limit=1)[0].name
 		item.insert()
-
-def setup_warehouse():
-	w = frappe.new_doc('Warehouse')
-	w.warehouse_name = 'Supplier'
-	w.insert()
 
 def setup_currency_exchange():
 	frappe.get_doc({
@@ -191,7 +182,7 @@ def setup_user():
 		user.password = 'demo'
 		user.insert()
 
-def import_json(doctype, submit=False, values=None):
+def import_json(doctype, submit=False):
 	frappe.flags.in_import = True
 	data = json.loads(open(frappe.get_app_path('erpnext', 'demo', 'data',
 		frappe.scrub(doctype) + '.json')).read())
@@ -201,8 +192,6 @@ def import_json(doctype, submit=False, values=None):
 		doc.insert()
 		if submit:
 			doc.submit()
-
-	frappe.db.commit()
 
 def setup_employee():
 	frappe.db.set_value("HR Settings", None, "emp_created_by", "Naming Series")
@@ -277,14 +266,13 @@ def setup_salary_structure():
 			and e.date_of_joining > f.year_start_date) else f.year_start_date
 		ss.to_date = f.year_end_date
 		ss.append('earnings', {
-			'salary_component': 'Basic',
-			'amount': random.random() * 10000
+			'earning_type': 'Basic',
+			'modified_value': random.random() * 10000
 		})
 		ss.append('deductions', {
-			'salary_component': 'Income Tax',
-			'amount': random.random() * 1000
+			'deduction_type': 'Income Tax',
+			'd_modified_amt': random.random() * 1000
 		})
-
 		ss.insert()
 
 def setup_account():
@@ -312,24 +300,3 @@ def setup_user_roles():
 		user = frappe.get_doc('User', 'GabrielleLoftus@example.com')
 		user.add_roles('Sales User', 'Sales Manager', 'Accounts User')
 		frappe.db.set_global('demo_sales_user_2', user.name)
-
-	if not frappe.db.get_global('demo_purchase_user'):
-		user = frappe.get_doc('User', 'MichalSobczak@example.com')
-		user.add_roles('Purchase User', 'Purchase Manager', 'Accounts User', 'Stock User')
-		frappe.db.set_global('demo_purchase_user', user.name)
-
-	if not frappe.db.get_global('demo_manufacturing_user'):
-		user = frappe.get_doc('User', 'NuranVerkleij@example.com')
-		user.add_roles('Manufacturing User', 'Stock User', 'Purchase User', 'Accounts User')
-		frappe.db.set_global('demo_manufacturing_user', user.name)
-
-	if not frappe.db.get_global('demo_stock_user'):
-		user = frappe.get_doc('User', 'HatsueKashiwagi@example.com')
-		user.add_roles('Manufacturing User', 'Stock User', 'Purchase User', 'Accounts User')
-		frappe.db.set_global('demo_stock_user', user.name)
-
-	if not frappe.db.get_global('demo_accounts_user'):
-		user = frappe.get_doc('User', 'LeonAbdulov@example.com')
-		user.add_roles('Accounts User', 'Accounts Manager', 'Sales User', 'Purchase User')
-		frappe.db.set_global('demo_accounts_user', user.name)
-

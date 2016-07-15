@@ -4,7 +4,6 @@
 cur_frm.add_fetch('employee', 'company', 'company');
 cur_frm.add_fetch('company', 'default_letter_head', 'letter_head');
 
-
 cur_frm.cscript.onload = function(doc, dt, dn){
 	e_tbl = doc.earnings || [];
 	d_tbl = doc.deductions || [];
@@ -23,8 +22,6 @@ cur_frm.cscript.refresh = function(doc, dt, dn){
 frappe.ui.form.on('Salary Structure', {
 	refresh: function(frm) {
 		frm.trigger("toggle_fields")
-		frm.fields_dict['earnings'].grid.set_column_disp("default_amount", false);
-		frm.fields_dict['deductions'].grid.set_column_disp("default_amount", false);
 	},
 
 	salary_slip_based_on_timesheet: function(frm) {
@@ -32,8 +29,7 @@ frappe.ui.form.on('Salary Structure', {
 	},
 
 	toggle_fields: function(frm) {
-		frm.toggle_display('time_sheet_earning_detail', frm.doc.salary_slip_based_on_timesheet);
-		frm.toggle_reqd('salary_component', frm.doc.salary_slip_based_on_timesheet);
+		frm.toggle_display('time_sheet_earning_detail', cint(frm.doc.salary_slip_based_on_timesheet)==1);
 	}
 })
 
@@ -49,20 +45,24 @@ cur_frm.cscript.employee = function(doc, dt, dn){
 		return get_server_fields('get_employee_details','','',doc,dt,dn);
 }
 
-cur_frm.cscript.amount = function(doc, cdt, cdn){
+cur_frm.cscript.modified_value = function(doc, cdt, cdn){
 	calculate_totals(doc, cdt, cdn);
 }
 
-var calculate_totals = function(doc) {
+cur_frm.cscript.d_modified_amt = function(doc, cdt, cdn){
+	calculate_totals(doc, cdt, cdn);
+}
+
+var calculate_totals = function(doc, cdt, cdn) {
 	var tbl1 = doc.earnings || [];
 	var tbl2 = doc.deductions || [];
 
 	var total_earn = 0; var total_ded = 0;
 	for(var i = 0; i < tbl1.length; i++){
-		total_earn += flt(tbl1[i].amount);
+		total_earn += flt(tbl1[i].modified_value);
 	}
 	for(var j = 0; j < tbl2.length; j++){
-		total_ded += flt(tbl2[j].amount);
+		total_ded += flt(tbl2[j].d_modified_amt);
 	}
 	doc.total_earning = total_earn;
 	doc.total_deduction = total_ded;
@@ -75,25 +75,10 @@ var calculate_totals = function(doc) {
 }
 
 cur_frm.cscript.validate = function(doc, cdt, cdn) {
-	calculate_totals(doc);
+	calculate_totals(doc, cdt, cdn);
 	if(doc.employee && doc.is_active == "Yes") frappe.model.clear_doc("Employee", doc.employee);
 }
 
 cur_frm.fields_dict.employee.get_query = function(doc,cdt,cdn) {
 	return{ query: "erpnext.controllers.queries.employee_query" }
 }
-
-
-frappe.ui.form.on('Salary Detail', {
-	amount: function(frm) {
-		calculate_totals(frm.doc);
-	},
-	
-	earnings_remove: function(frm) {
-		calculate_totals(frm.doc);
-	}, 
-	
-	deductions_remove: function(frm) {
-		calculate_totals(frm.doc);
-	}
-})

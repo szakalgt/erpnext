@@ -39,6 +39,7 @@ frappe.ui.form.on("Request for Quotation",{
 
 	refresh: function(frm, cdt, cdn) {
 		if (frm.doc.docstatus === 1) {
+			frm.dashboard.show_dashboard();
 			frm.add_custom_button(__("Make"),
 				function(){ frm.trigger("make_suppplier_quotation") }, __("Supplier Quotation"));
 
@@ -99,19 +100,8 @@ frappe.ui.form.on("Request for Quotation",{
 frappe.ui.form.on("Request for Quotation Supplier",{
 	supplier: function(frm, cdt, cdn) {
 		var d = locals[cdt][cdn]
-		frappe.call({
-			method:"erpnext.accounts.party.get_party_details",
-			args:{
-				party: d.supplier,
-				party_type: 'Supplier'
-			},
-			callback: function(r){
-				if(r.message){
-					frappe.model.set_value(cdt, cdn, 'contact', r.message.contact_person)
-					frappe.model.set_value(cdt, cdn, 'email_id', r.message.contact_email)
-				}
-			}
-		})
+		frappe.model.set_value(cdt, cdn, 'contact', '')
+		frappe.model.set_value(cdt, cdn, 'email_id', '')
 	},
 
 	download_pdf: function(frm, cdt, cdn) {
@@ -135,7 +125,7 @@ erpnext.buying.RequestforQuotationController = erpnext.buying.BuyingController.e
 		if (this.frm.doc.docstatus===0) {
 			cur_frm.add_custom_button(__('Material Request'),
 				function() {
-					erpnext.utils.map_current_doc({
+					frappe.model.map_current_doc({
 						method: "erpnext.stock.doctype.material_request.material_request.make_request_for_quotation",
 						source_doctype: "Material Request",
 						get_query_filters: {

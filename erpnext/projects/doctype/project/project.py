@@ -19,7 +19,7 @@ class Project(Document):
 			self.load_tasks()
 
 		self.set_onload('activity_summary', frappe.db.sql('''select activity_type, sum(hours) as total_hours
-			from `tabTimesheet Detail` where project=%s group by activity_type order by total_hours desc''', self.name, as_dict=True))
+			from `tabTime Sheet Detail` where project=%s group by activity_type order by total_hours desc''', self.name, as_dict=True))
 
 	def __setup__(self):
 		self.onload()
@@ -105,7 +105,7 @@ class Project(Document):
 			min(from_time) as start_date,
 			max(to_time) as end_date,
 			sum(hours) as time
-			from `tabTimesheet Detail` where project = %s and docstatus = 1""", self.name, as_dict=1)[0]
+			from `tabTime Sheet Detail` where project = %s and docstatus = 1""", self.name, as_dict=1)[0]
 
 		from_expense_claim = frappe.db.sql("""select
 			sum(total_sanctioned_amount) as total_sanctioned_amount
@@ -151,14 +151,10 @@ class Project(Document):
 				frappe.sendmail(user.user, subject=_("Project Collaboration Invitation"), content=content.format(*messages))
 				user.welcome_email_sent=1
 
-	def on_update(self):
-		self.load_tasks()
-		self.sync_tasks()
-
 def get_timeline_data(doctype, name):
 	'''Return timeline for attendance'''
 	return dict(frappe.db.sql('''select unix_timestamp(from_time), count(*)
-		from `tabTimesheet Detail` where project=%s
+		from `tabTime Sheet Detail` where project=%s
 			and from_time > date_sub(curdate(), interval 1 year)
 			and docstatus < 2
 			group by date(from_time)''', name))

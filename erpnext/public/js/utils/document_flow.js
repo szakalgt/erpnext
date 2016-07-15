@@ -5,23 +5,23 @@
 
 $.extend(frappe.document_flow, {
 	"Selling": {
-		"Sales Order": ["Quotation", "Sales Order", "Delivery Note", "Sales Invoice", "Payment Entry"],
-		"Quotation": ["Quotation", "Sales Order", "Delivery Note", "Sales Invoice", "Payment Entry"]
+		"Sales Order": ["Quotation", "Sales Order", "Delivery Note", "Sales Invoice", "Journal Entry"],
+		"Quotation": ["Quotation", "Sales Order", "Delivery Note", "Sales Invoice", "Journal Entry"]
 	},
 	"Accounts": {
-		"Sales Invoice": ["Quotation", "Sales Order", "Delivery Note", "Sales Invoice", "Payment Entry"],
+		"Sales Invoice": ["Quotation", "Sales Order", "Delivery Note", "Sales Invoice", "Journal Entry"],
 		"Purchase Invoice": ["Supplier Quotation", "Purchase Order", "Purchase Receipt",
-			"Purchase Invoice", "Payment Entry"]
+			"Purchase Invoice", "Journal Entry"]
 	},
 	"Buying": {
-		// "Purchase Order": ["Supplier Quotation", "Purchase Order", "Purchase Receipt",
-		// 	"Purchase Invoice", "Payment Entry"],
+		"Purchase Order": ["Supplier Quotation", "Purchase Order", "Purchase Receipt",
+			"Purchase Invoice", "Journal Entry"],
 		"Supplier Quotation": ["Supplier Quotation", "Purchase Order", "Purchase Receipt",
-			"Purchase Invoice", "Payment Entry"]
+			"Purchase Invoice", "Journal Entry"]
 	},
 	"Stock": {
-		"Delivery Note": ["Quotation", "Sales Order", "Delivery Note", "Sales Invoice", "Payment Entry"],
+		"Delivery Note": ["Quotation", "Sales Order", "Delivery Note", "Sales Invoice", "Journal Entry"],
 		"Purchase Receipt": ["Supplier Quotation", "Purchase Order", "Purchase Receipt",
-			"Purchase Invoice", "Payment Entry"]
+			"Purchase Invoice", "Journal Entry"]
 	}
 });

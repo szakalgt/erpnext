@@ -50,17 +50,19 @@ class Opportunity(TransactionBase):
 				if sender_name == self.contact_email:
 					sender_name = None
 
-				if not sender_name and self.contact_email.index('@'):
+				account = _('Unknown')
+
+				if self.contact_email.index('@'):
 					email_name = self.contact_email[0:self.contact_email.index('@')]
 
 					email_split = email_name.split('.')
 					for s in email_split:
-						sender_name += s.capitalize() + ' '
+						account = account + s.capitalize() + ' '
 
 				lead = frappe.get_doc({
 					"doctype": "Lead",
 					"email_id": self.contact_email,
-					"lead_name": sender_name
+					"lead_name": sender_name or account
 				})
 				lead.insert(ignore_permissions=True)
 				lead_name = lead.name
@@ -189,18 +191,16 @@ def get_item_details(item_code):
 def make_quotation(source_name, target_doc=None):
 	def set_missing_values(source, target):
 		quotation = frappe.get_doc(target)
-		
-		company_currency = frappe.db.get_value("Company", quotation.company, "default_currency")
-		party_account_currency = get_party_account_currency("Customer", quotation.customer, 
-			quotation.company) if quotation.customer else company_currency
-		
-		quotation.currency = party_account_currency or company_currency
 
-		if company_currency == quotation.currency:
+		company_currency = frappe.db.get_value("Company", quotation.company, "default_currency")
+		party_account_currency = get_party_account_currency("Customer", quotation.customer, quotation.company)
+
+		if company_currency == party_account_currency:
 			exchange_rate = 1
 		else:
-			exchange_rate = get_exchange_rate(quotation.currency, company_currency)
+			exchange_rate = get_exchange_rate(party_account_currency, company_currency)
 
+		quotation.currency = party_account_currency or company_currency
 		quotation.conversion_rate = exchange_rate
 
 		quotation.run_method("set_missing_values")

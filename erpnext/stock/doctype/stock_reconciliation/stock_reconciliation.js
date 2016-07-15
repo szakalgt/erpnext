@@ -5,8 +5,6 @@ frappe.provide("erpnext.stock");
 
 frappe.ui.form.on("Stock Reconciliation", {
 	onload: function(frm) {
-		frm.add_fetch("item_code", "item_name", "item_name");
-		
 		// end of life
 		frm.set_query("item_code", "items", function(doc, cdt, cdn) {
 			return {
@@ -17,12 +15,6 @@ frappe.ui.form.on("Stock Reconciliation", {
 				}
 			}
 		});
-		
-		if (frm.doc.company) {
-			erpnext.queries.setup_queries(frm, "Warehouse", function() {
-				return erpnext.queries.warehouse(frm.doc);
-			});
-		}
 	},
 
 	refresh: function(frm) {
@@ -140,13 +132,6 @@ erpnext.stock.StockReconciliation = erpnext.stock.StockController.extend({
 				}
 			}
 		}
-		
-		this.frm.get_field('items').grid.editable_fields = [
-			{fieldname: 'item_code', columns: 3},
-			{fieldname: 'warehouse', columns: 3},
-			{fieldname: 'qty', columns: 2},
-			{fieldname: 'valuation_rate', columns: 3}
-		];
 	},
 
 	refresh: function() {

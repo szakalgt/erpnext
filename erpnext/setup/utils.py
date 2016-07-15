@@ -65,9 +65,6 @@ def before_tests():
 
 @frappe.whitelist()
 def get_exchange_rate(from_currency, to_currency):
-	if not (from_currency and to_currency):
-		return
-	
 	if from_currency == to_currency:
 		return 1
 	

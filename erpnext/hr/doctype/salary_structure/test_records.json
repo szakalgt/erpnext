@@ -6,18 +6,10 @@
 		"from_date": "2014-02-01",
 		"earnings": [
 			{
-				"salary_component": "_Test Basic Salary"
+				"earning_type": "_Test Basic Salary"
 			},
 			{
-				"salary_component": "_Test Allowance"
-			}
-		],
-		"deductions": [
-			{
-				"salary_component": "_Test Professional Tax"
-			},
-			{
-				"salary_component": "_Test TDS"
+				"earning_type": "_Test Allowance"
 			}
 		]
 	}

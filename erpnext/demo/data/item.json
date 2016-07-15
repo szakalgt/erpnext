@@ -92,8 +92,7 @@
   "image": null,
   "item_code": "Base Plate",
   "item_group": "Raw Material",
-  "item_name": "Base Plate",
-  "is_sub_contracted_item": 1
+  "item_name": "Base Plate"
  },
  {
   "default_supplier": "Scott Ties",

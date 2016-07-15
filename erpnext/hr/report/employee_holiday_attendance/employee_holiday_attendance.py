@@ -24,34 +24,25 @@ def get_columns():
 		_("Holiday") + ":Data:200"
 	]
 
-def get_employees(filters):
-	holiday_filter = {"holiday_date": (">=", filters.from_date),
-				"holiday_date": ("<=", filters.to_date)}
-	if filters.holiday_list:
-		holiday_filter["parent"] = filters.holiday_list
-		
-	holidays = frappe.get_all("Holiday", fields=["holiday_date", "description"],
-				filters=holiday_filter)
 
+def get_employees(filters):
+	holidays = frappe.get_all("Holiday", fields=["holiday_date", "description"],
+				filters=[["holiday_date", ">=",
+				filters.from_date],
+				["holiday_date", "<=", filters.to_date]])
 	holiday_names = {}
 	holidays_list = []
 
 	for holiday in holidays:
 		holidays_list.append(holiday.holiday_date)
 		holiday_names[holiday.holiday_date] = holiday.description
-
 	if(holidays_list):
-		cond = " att_date in %(holidays_list)s"
-
-		if filters.holiday_list:
-			cond += """ and (employee in (select employee from tabEmployee where holiday_list = %(holidays)s))"""
-
 		employee_list = frappe.db.sql("""select
 				employee, employee_name, att_date, status
 			from tabAttendance
-			where %s"""% cond.format(', '.join(["%s"] * len(holidays_list))),
-				{'holidays_list':holidays_list,
-				 'holidays':filters.holiday_list}, as_list=True)
+			where
+				att_date in ({0})""".format(', '.join(["%s"] * len(holidays_list))),
+				holidays_list, as_list=True)
 
 		for employee_data in employee_list:
 			employee_data.append(holiday_names[employee_data[2]])

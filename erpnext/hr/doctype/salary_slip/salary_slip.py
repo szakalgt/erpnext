@@ -23,7 +23,7 @@ class SalarySlip(TransactionBase):
 		self.validate_dates()
 		self.check_existing()
 		self.set_month_dates()
-		
+
 		if not (len(self.get("earnings")) or len(self.get("deductions"))):
 			self.get_emp_and_leave_details()
 		else:
@@ -64,7 +64,7 @@ class SalarySlip(TransactionBase):
 		if self.salary_slip_based_on_timesheet and not self.get('timesheets'):
 			self.set("timesheets", [])
 
-			timesheets = frappe.db.sql(""" select * from `tabTimesheet` where employee = %(employee)s and (status = 'Submitted' or
+			timesheets = frappe.db.sql(""" select * from `tabTime Sheet` where employee = %(employee)s and (status = 'Submitted' or
 				status = 'Billed')""", {'employee': self.employee}, as_dict=1)
 
 			for data in timesheets:
@@ -101,20 +101,20 @@ class SalarySlip(TransactionBase):
 			self.salary_structure = ss_doc.name
 			self.hour_rate = ss_doc.hour_rate
 			self.total_working_hours = sum([d.working_hours or 0.0 for d in self.timesheets]) or 0.0
-			self.add_earning_for_hourly_wages(ss_doc.salary_component)
+			self.add_earning_for_hourly_wages(ss_doc.earning_type)
 
-	def add_earning_for_hourly_wages(self, salary_component):
+	def add_earning_for_hourly_wages(self, earning_type):
 		default_type = False
 		for data in self.earnings:
-			if data.salary_component == salary_component:
-				data.amount = self.hour_rate * self.total_working_hours
+			if data.earning_type == earning_type:
+				data.earning_amount = self.hour_rate * self.total_working_hours
 				default_type = True
 				break
 
 		if not default_type:
 			earnings = self.append('earnings', {})
-			earnings.salary_component = salary_component
-			earnings.amount = self.hour_rate * self.total_working_hours
+			earnings.earning_type = earning_type
+			earnings.earning_amount = self.hour_rate * self.total_working_hours
 
 	def pull_emp_details(self):
 		emp = frappe.db.get_value("Employee", self.employee, ["bank_name", "bank_ac_no"], as_dict=1)
@@ -220,32 +220,33 @@ class SalarySlip(TransactionBase):
 				frappe.throw(_("Salary Slip of employee {0} already created for this period").format(self.employee))
 		else:
 			for data in self.timesheets:
-				if frappe.db.get_value('Timesheet', data.time_sheet, 'status') == 'Payrolled':
+				if frappe.db.get_value('Time Sheet', data.time_sheet, 'status') == 'Payrolled':
 					frappe.throw(_("Salary Slip of employee {0} already created for time sheet {1}").format(self.employee, data.time_sheet))
 
 	def calculate_earning_total(self):
 		self.gross_pay = flt(self.arrear_amount) + flt(self.leave_encashment_amount)
 		for d in self.get("earnings"):
-			if cint(d.depends_on_lwp) == 1 and not self.salary_slip_based_on_timesheet:
-				d.amount = rounded((flt(d.default_amount) * flt(self.payment_days)
-					/ cint(self.total_days_in_month)), self.precision("amount", "earnings"))
-			elif not self.payment_days and not self.salary_slip_based_on_timesheet:
-				d.amount = 0
-			elif not d.amount:
-				d.amount = d.default_amount
-			self.gross_pay += flt(d.amount)
+			if cint(d.e_depends_on_lwp) == 1:
+				d.earning_amount = rounded((flt(d.e_amount) * flt(self.payment_days)
+					/ cint(self.total_days_in_month)), self.precision("earning_amount", "earnings"))
+			elif not self.payment_days:
+				d.earning_amount = 0
+			elif not d.earning_amount:
+				d.earning_amount = d.e_amount
+			self.gross_pay += flt(d.earning_amount)
 
 	def calculate_ded_total(self):
 		self.total_deduction = 0
 		for d in self.get('deductions'):
-			if cint(d.depends_on_lwp) == 1 and not self.salary_slip_based_on_timesheet:
-				d.amount = rounded((flt(d.amount) * flt(self.payment_days)
-					/ cint(self.total_days_in_month)), self.precision("amount", "deductions"))
-			elif not self.payment_days and not self.salary_slip_based_on_timesheet:
-				d.amount = 0
-			elif not d.amount:
-				d.amount = d.default_amount
-			self.total_deduction += flt(d.amount)
+			if cint(d.d_depends_on_lwp) == 1:
+				d.deduction_amount = rounded((flt(d.d_amount) * flt(self.payment_days)
+					/ cint(self.total_days_in_month)), self.precision("deduction_amount", "deductions"))
+			elif not self.payment_days:
+				d.deduction_amount = 0
+			elif not d.deduction_amount:
+				d.deduction_amount = d.d_amount
+
+			self.total_deduction += flt(d.deduction_amount)
 
 	def calculate_net_pay(self):
 		disable_rounded_total = cint(frappe.db.get_value("Global Defaults", None, "disable_rounded_total"))
@@ -277,7 +278,7 @@ class SalarySlip(TransactionBase):
 	def update_status(self, salary_slip=None):
 		for data in self.timesheets:
 			if data.time_sheet:
-				timesheet = frappe.get_doc('Timesheet', data.time_sheet)
+				timesheet = frappe.get_doc('Time Sheet', data.time_sheet)
 				timesheet.salary_slip = salary_slip
 				timesheet.flags.ignore_validate_update_after_submit = True
 				timesheet.set_status()

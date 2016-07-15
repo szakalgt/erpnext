@@ -29,6 +29,8 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 			cur_frm.msgbox.hide();
 		}
 
+		cur_frm.dashboard.reset();
+
 		this.frm.toggle_reqd("due_date", !this.frm.doc.is_return);
 
 		this.show_general_ledger();
@@ -66,11 +68,11 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 			if(doc.outstanding_amount!=0 && !cint(doc.is_return)) {
 				cur_frm.add_custom_button(__('Payment'), this.make_payment_entry, __("Make"));
 			}
-
+			
 			if(doc.outstanding_amount>0 && !cint(doc.is_return)) {
 				cur_frm.add_custom_button(__('Payment Request'), this.make_payment_request, __("Make"));
 			}
-
+			
 
 		}
 
@@ -101,7 +103,7 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 	sales_order_btn: function() {
 		this.$sales_order_btn = cur_frm.add_custom_button(__('Sales Order'),
 			function() {
-				erpnext.utils.map_current_doc({
+				frappe.model.map_current_doc({
 					method: "erpnext.selling.doctype.sales_order.sales_order.make_sales_invoice",
 					source_doctype: "Sales Order",
 					get_query_filters: {
@@ -118,7 +120,7 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 	delivery_note_btn: function() {
 		this.$delivery_note_btn = cur_frm.add_custom_button(__('Delivery Note'),
 			function() {
-				erpnext.utils.map_current_doc({
+				frappe.model.map_current_doc({
 					method: "erpnext.stock.doctype.delivery_note.delivery_note.make_sales_invoice",
 					source_doctype: "Delivery Note",
 					get_query: function() {
@@ -236,32 +238,6 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 					frappe.model.set_value(cdt, cdn, "cost_center", r.message[1]);
 				}
 			})
-		}
-	},
-
-	is_pos: function(frm){
-		if(this.frm.doc.is_pos) {
-			if(!this.frm.doc.company) {
-				this.frm.set_value("is_pos", 0);
-				msgprint(__("Please specify Company to proceed"));
-			} else {
-				var me = this;
-				return this.frm.call({
-					doc: me.frm.doc,
-					method: "set_missing_values",
-					callback: function(r) {
-						if(!r.exc) {
-							if(r.message && r.message.print_format) {
-								frm.pos_print_format = r.message.print_format;
-							}
-							me.frm.script_manager.trigger("update_stock");
-							frappe.model.set_default_values(me.frm.doc);
-							me.set_dynamic_labels();
-							me.calculate_taxes_and_totals();
-						}
-					}
-				});
-			}
 		}
 	}
 });
@@ -450,18 +426,11 @@ frappe.ui.form.on('Sales Invoice', {
 		frm.fields_dict["timesheets"].grid.get_field("time_sheet").get_query = function(doc, cdt, cdn){
 			return {
 				filters: [
-					["Timesheet", "status", "in", ["Submitted", "Payslip"]]
+					["Time Sheet", "status", "in", ["Submitted", "Payslip"]]
 				]
 			}
 		}
-
-		if(frm.doc.is_pos){
-			frm.get_field('payments').grid.editable_fields = [
-				{fieldname: 'mode_of_payment', columns: 2},
-				{fieldname: 'amount', columns: 2}
-			];
-		}
-	},
+	}
 })
 
 frappe.ui.form.on('Sales Invoice Timesheet', {

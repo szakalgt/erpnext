@@ -96,12 +96,13 @@ def get_data():
 					"description": _("Price List master.")
 				},
 				{
-					"type": "doctype",
-					"name": "Item Group",
+					"type": "page",
+					"name": "Tree",
 					"icon": "icon-sitemap",
 					"label": _("Item Group"),
 					"link": "Tree/Item Group",
 					"description": _("Tree of Item Groups."),
+					"doctype": "Item Group",
 				},
 				{
 					"type": "doctype",

@@ -9,7 +9,6 @@ from frappe import _, msgprint, throw
 from erpnext.accounts.party import get_party_account, get_due_date
 from erpnext.controllers.stock_controller import update_gl_entries_after
 from frappe.model.mapper import get_mapped_doc
-from erpnext.accounts.doctype.sales_invoice.pos import update_multi_mode_option
 
 from erpnext.controllers.selling_controller import SellingController
 from erpnext.accounts.utils import get_account_currency
@@ -239,7 +238,7 @@ class SalesInvoice(SellingController):
 	def update_time_sheet(self, sales_invoice):
 		for d in self.timesheets:
 			if d.time_sheet:
-				timesheet = frappe.get_doc("Timesheet", d.time_sheet)
+				timesheet = frappe.get_doc("Time Sheet", d.time_sheet)
 				timesheet.sales_invoice = sales_invoice
 				timesheet.flags.ignore_validate_update_after_submit = True
 				timesheet.set_status()
@@ -248,9 +247,9 @@ class SalesInvoice(SellingController):
 	def validate_time_sheets_are_submitted(self):
 		for data in self.timesheets:
 			if data.time_sheet:
-				status = frappe.db.get_value("Timesheet", data.time_sheet, "status")
+				status = frappe.db.get_value("Time Sheet", data.time_sheet, "status")
 				if status not in ['Submitted', 'Payslip']:
-					frappe.throw(_("Timesheet {0} is already completed or cancelled").format(data.time_sheet))
+					frappe.throw(_("Time Sheet {0} is already completed or cancelled").format(data.time_sheet))
 
 	def set_pos_fields(self, for_validate=False):
 		"""Set retail related fields from POS Profiles"""
@@ -291,10 +290,6 @@ class SalesInvoice(SellingController):
 			# fetch charges
 			if self.taxes_and_charges and not len(self.get("taxes")):
 				self.set_taxes()
-
-			if not self.get('payments'):
-				pos_profile = frappe.get_doc('POS Profile', pos.name)
-				update_multi_mode_option(self, pos_profile)
 
 		return pos
 

@@ -28,12 +28,13 @@ def get_data():
 					"description": _("Customer database."),
 				},
 				{
-					"type": "doctype",
+					"type": "page",
 					"label": _("Customer Group"),
-					"name": "Customer Group",
+					"name": "Tree",
 					"icon": "icon-sitemap",
 					"link": "Tree/Customer Group",
 					"description": _("Manage Customer Group Tree."),
+					"doctype": "Customer Group",
 				},
 				{
 					"type": "doctype",
@@ -67,12 +68,13 @@ def get_data():
 					"description": _("Price List master.")
 				},
 				{
-					"type": "doctype",
-					"name": "Item Group",
+					"type": "page",
+					"name": "Tree",
 					"icon": "icon-sitemap",
 					"label": _("Item Group"),
 					"link": "Tree/Item Group",
 					"description": _("Tree of Item Groups."),
+					"doctype": "Item Group",
 				},
 				{
 					"type": "doctype",
@@ -97,12 +99,13 @@ def get_data():
 			"label": _("Sales Partners and Territory"),
 			"items": [
 				{
-					"type": "doctype",
+					"type": "page",
 					"label": _("Territory"),
-					"name": "Territory",
+					"name": "Tree",
 					"icon": "icon-sitemap",
 					"link": "Tree/Territory",
 					"description": _("Manage Territory Tree."),
+					"doctype": "Territory",
 				},
 				{
 					"type": "doctype",
@@ -110,12 +113,13 @@ def get_data():
 					"description": _("Manage Sales Partners."),
 				},
 				{
-					"type": "doctype",
+					"type": "page",
 					"label": _("Sales Person"),
-					"name": "Sales Person",
+					"name": "Tree",
 					"icon": "icon-sitemap",
 					"link": "Tree/Sales Person",
 					"description": _("Manage Sales Person Tree."),
+					"doctype": "Sales Person",
 				},
 				{
 					"type": "report",
